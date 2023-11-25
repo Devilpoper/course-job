@@ -19,6 +19,7 @@ char* get_sentence(char* text, int i, int* count_words);
 char* valid_sent(char* str, int* count_words);
 char** sep_to_words(char* sentence, int count_words);
 char* get_marks(char* sentence, int count_words);
+void paint_words(char* word, char mark);
 
 int main(){
     printf("Course work for option 5.7, created by Ryabov Mikhail.\n");
@@ -34,19 +35,26 @@ int main(){
     Text text;
     text.t = get_text(&text.count_sentence, &text.size);   
     Sentence* sentences = (Sentence*)malloc(sizeof(Sentence) * text.count_sentence);
-    
-    for (int i = 0; i < text.count_sentence; i++){
-        sentences[i].text_sentence = get_sentence(text.t, i, &sentences[i].count_words);
-        sentences[i].len = strlen(sentences[i].text_sentence) + 1;
-        printf("%s - %d words\n", sentences[i].text_sentence, sentences[i].count_words);
-    }
-    
-    char* mark1 = get_marks(sentences[0].text_sentence, sentences[0].count_words);
-    printf("\n%s\n", mark1);
+    char*** arr_all_words = (char***)malloc(sizeof(char**) * text.count_sentence);
+    char** arr_all_marks = (char**)malloc(sizeof(char*) * text.count_sentence);
 
     switch (choise){
         case 1:
             //раскраска слов
+            for (int i = 0; i < text.count_sentence; i++){
+                sentences[i].text_sentence = get_sentence(text.t, i, &sentences[i].count_words);
+                sentences[i].len = strlen(sentences[i].text_sentence) + 1;
+            }
+
+            for (int i = 0; i < text.count_sentence; i++){
+                arr_all_marks[i] = get_marks(sentences[i].text_sentence, sentences[i].count_words);
+                arr_all_words[i] = sep_to_words(sentences[i].text_sentence, sentences[i].count_words);
+
+                for (int j = 0; j < sentences[i].count_words; j++){
+                    paint_words(arr_all_words[i][j], arr_all_marks[i][j]);
+                }
+                printf("\n");
+            }
             break;
         case 2:
             break;
@@ -155,15 +163,52 @@ char** sep_to_words(char* sentence, int count_words) {
 char* get_marks(char* sentence, int count_words){
     char* marks = (char*)malloc(sizeof(char) * (count_words * 2));
     int i = 0, size = 0;
-    while (1){
-        if (sentence[i] == '\0'){
-            break;
-        }
-        if (sentence[i] == ' ' || sentence[i] == ',' || sentence[i] == '.'){
+
+    while (sentence[i] != '\0'){
+        if (sentence[i] == ' ' || sentence[i] == '.'){
             marks[size++] = sentence[i];
         }
+
+        if (sentence[i] == ','){
+            marks[size++] = sentence[i];
+            i++;
+        }
+
         i++;
     }
+
     marks[size] = '\0';
     return marks;
+}
+
+void paint_words(char* word, char mark){
+    int result = strlen(word) % 4;
+    if (mark != ' '){
+        if (result == 0) {
+            printf("\x1b[31m%s\x1b[0m%c ", word, mark);
+        }
+        if (result == 1) {
+            printf("\x1b[34m%s\x1b[0m%c ", word, mark);
+        }
+        if (result == 2) {
+            printf("\x1b[32m%s\x1b[0m%c ", word, mark);
+        }
+        if (result == 3) {
+            printf("\x1b[33m%s\x1b[0m%c", word, mark);
+        }       
+    }
+    else{
+        if (result == 0) {
+            printf("\x1b[31m%s\x1b[0m ", word);
+        }
+        if (result == 1) {
+            printf("\x1b[34m%s\x1b[0m ", word);
+        }
+        if (result == 2) {
+            printf("\x1b[32m%s\x1b[0m ", word);
+        }
+        if (result == 3) {
+            printf("\x1b[33m%s\x1b[0m ", word);
+        }
+    }
 }
