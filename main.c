@@ -18,6 +18,7 @@ char* get_text(int* count_sentence, int* size);
 char* get_sentence(char* text, int i, int* count_words);
 char* valid_sent(char* str, int* count_words);
 char** sep_to_words(char* sentence, int count_words);
+char* get_marks(char* sentence, int count_words);
 
 int main(){
     printf("Course work for option 5.7, created by Ryabov Mikhail.\n");
@@ -36,21 +37,12 @@ int main(){
     
     for (int i = 0; i < text.count_sentence; i++){
         sentences[i].text_sentence = get_sentence(text.t, i, &sentences[i].count_words);
+        sentences[i].len = strlen(sentences[i].text_sentence) + 1;
         printf("%s - %d words\n", sentences[i].text_sentence, sentences[i].count_words);
     }
-
-    char** arr_words = sep_to_words(sentences[0].text_sentence, sentences[0].count_words);
-        for (int j = 0; j < sentences[0].count_words; j++){
-            printf("    %s %dst word\n", arr_words[j], j);
-        }
-    char** arr_words1 = sep_to_words(sentences[1].text_sentence, sentences[1].count_words);
-        for (int j = 0; j < sentences[1].count_words; j++){
-            printf("    %s %dst word\n", arr_words1[j], j);
-        }
-    char** arr_words2 = sep_to_words(sentences[2].text_sentence, sentences[2].count_words);
-        for (int j = 0; j < sentences[2].count_words; j++){
-            printf("    %s %dst word\n", arr_words2[j], j);
-        }
+    
+    char* mark1 = get_marks(sentences[0].text_sentence, sentences[0].count_words);
+    printf("\n%s\n", mark1);
 
     switch (choise){
         case 1:
@@ -158,4 +150,20 @@ char** sep_to_words(char* sentence, int count_words) {
         i++;
     }
     return arr_words;
+}
+
+char* get_marks(char* sentence, int count_words){
+    char* marks = (char*)malloc(sizeof(char) * (count_words * 2));
+    int i = 0, size = 0;
+    while (1){
+        if (sentence[i] == '\0'){
+            break;
+        }
+        if (sentence[i] == ' ' || sentence[i] == ',' || sentence[i] == '.'){
+            marks[size++] = sentence[i];
+        }
+        i++;
+    }
+    marks[size] = '\0';
+    return marks;
 }
