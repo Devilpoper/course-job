@@ -37,6 +37,8 @@ int main(){
     Sentence* sentences = (Sentence*)malloc(sizeof(Sentence) * text.count_sentence);
     char*** arr_all_words = (char***)malloc(sizeof(char**) * text.count_sentence);
     char** arr_all_marks = (char**)malloc(sizeof(char*) * text.count_sentence);
+    char* null_ptr = (char*)malloc(sizeof(char));
+    null_ptr[0] = '\0';
 
     switch (choise){
         case 1:
@@ -46,7 +48,19 @@ int main(){
                 sentences[i].len = strlen(sentences[i].text_sentence) + 1;
             }
 
+            for( int i = 0; i < text.count_sentence; i++){
+                for (int j = i+1; j < text.count_sentence; j++){
+                    if(strcmp(sentences[i].text_sentence, sentences[j].text_sentence) == 0){
+                        sentences[j].text_sentence = null_ptr;
+                        sentences[j].len = 1;
+                    }
+                }
+            }
+
             for (int i = 0; i < text.count_sentence; i++){
+                if (sentences[i].len == 1){
+                    continue;
+                }
                 arr_all_marks[i] = get_marks(sentences[i].text_sentence, sentences[i].count_words);
                 arr_all_words[i] = sep_to_words(sentences[i].text_sentence, sentences[i].count_words);
 
