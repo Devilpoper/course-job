@@ -14,83 +14,35 @@ typedef struct {
     int count_words;
     int len;
     int self_number_in_text;
+    int last_word;
 } Sentence;
 
-char* get_text(int* count_sentence, int* size);
+char* get_structure_text(int* count_sentence, int* size);
 char* get_sentence(char* text, int i, int* count_words);
 char* valid_sent(char* str, int* count_words);
 char** sep_to_words(char* sentence, int count_words);
 char** get_marks(char* sentence, int count_words);
 
 Sentence* get_structure_sentences(int count_sentence, char* text);
+int get_last_word(Sentence* sen_ptr);
+int compare(const void* a, const void* b);
+void sort_by_last(Sentence* sentences, int count_sentence);
 void print_word_with_cap(Sentence sen);
 void delete_numbers(Sentence sen);
 void paint_words(Sentence sen);
+void input_choise(int choise);
 
 int main(){
     printf("Course work for option 5.7, created by Ryabov Mikhail.\n");
 
     int choise;
     scanf("%d", &choise);
-
-    if (choise == 5){
-        // Вывод справки о функциях
-        exit(0);
-    }
-
-    Text text;
-    text.t = get_text(&text.count_sentence, &text.size);   
-    Sentence* sentences = get_structure_sentences(text.count_sentence, text.t);
-
-
-    switch (choise){
-        case 0:
-            for (int i = 0; i < text.count_sentence; i++){
-                if (sentences[i].len == 1){
-                    continue;
-                }
-                printf("%s\n", sentences[i].text_sentence);
-            }
-            break;
-        case 1:
-            for (int i = 0; i < text.count_sentence; i++){
-                if (sentences[i].len == 1){
-                    continue;
-                }
-                paint_words(sentences[i]);
-            }
-            break;
-        case 2:
-            for (int i = 0; i < text.count_sentence; i++){
-                if (sentences[i].len == 1){
-                    continue;
-                }
-                print_word_with_cap(sentences[i]);
-            }
-            break;
-        case 3:
-            for (int i = 0; i < text.count_sentence; i++){
-                if (sentences[i].len == 1){
-                    continue;
-                }
-                print_word_with_cap(sentences[i]);
-            }
-            break;
-        case 4:
-            for (int i = 0; i < text.count_sentence; i++){
-                if (sentences[i].len == 1){
-                    continue;
-                }
-                delete_numbers(sentences[i]);
-            }
-            break;
-        default:
-            printf("Error: incorrect choise (choose 5 for view all options)");
-    }
+    input_choise(choise);
+    
     return 0;
 }
 
-char* get_text(int* count_sentence, int* size){
+char* get_structure_text(int* count_sentence, int* size){
     (*count_sentence) = 0;
     (*size) = 0;
     int capacity = 2, count_n = 0;
@@ -136,6 +88,7 @@ char* valid_sent(char* str, int* count_words){
 
     for (;i < len-1; i++) {
         if (str[i] == '\n' || str[i] == '\t' || str[i] == ' ') {
+            
             new_str[j++] = ' ';
             (*count_words) ++;
         }
@@ -262,6 +215,35 @@ void print_word_with_cap(Sentence sen){
     }
 }
 
+int get_last_word(Sentence* sen_ptr){
+    int size = 0;
+    int i = (sen_ptr->len) - 3;
+    while (sen_ptr->text_sentence[i] != ' ' && i != 0){
+        size++;
+        i--;
+    }
+    return size;
+}
+
+int compare(const void* a, const void* b){
+    Sentence* first = (Sentence*) a;
+    Sentence* second = (Sentence*) b;
+    first->last_word = get_last_word(first);
+    second->last_word = get_last_word(second);
+    return (second->last_word) - (first->last_word);
+}
+
+void sort_by_last(Sentence* sentences, int count_sentence){
+    
+    qsort(sentences, count_sentence, sizeof(Sentence), compare);
+    for (int i = 0; i < count_sentence; i++){
+        if (sentences[i].len == 1){
+            continue;
+        }
+        printf("%s\n", sentences[i].text_sentence);
+    }
+}
+
 void delete_numbers(Sentence sen){
     char** marks = get_marks(sen.text_sentence, sen.count_words);
     char** words = sep_to_words(sen.text_sentence, sen.count_words);
@@ -270,6 +252,66 @@ void delete_numbers(Sentence sen){
         if (strtol(words[i], NULL, 10) == 0){
             printf("%s%s", words[i], marks[i]);
         }
+        else{
+            if ( i == sen.count_words-1){
+                printf(".");
+            }
+        }
     }
     printf("\n");
+}
+
+void input_choise(int choise){
+    if (choise == 5){
+        printf("help about functions\n\
+        1 - “Color” each word depending on the remainder of dividing its length by 4. If the remainder is 0 - red, 1 - blue, 2 - green, 3 - yellow.\n\
+        2 - Print each word that begins and ends with a capital letter and the sentence numbers in which it appears.\n\
+        3 - Sort sentences by the length of the last word in the sentence.\n\
+        4 - Remove all numbers from sentences. A number is a set of consecutive numbers preceded and followed by spaces.\n");
+        exit(0);
+    }
+
+    Text text;
+    text.t = get_structure_text(&text.count_sentence, &text.size);   
+    Sentence* sentences = get_structure_sentences(text.count_sentence, text.t);
+
+    switch (choise){
+        case 0:
+            for (int i = 0; i < text.count_sentence; i++){
+                if (sentences[i].len == 1){
+                    continue;
+                }
+                printf("%s\n", sentences[i].text_sentence);
+            }
+            break;
+        case 1:
+            for (int i = 0; i < text.count_sentence; i++){
+                if (sentences[i].len == 1){
+                    continue;
+                }
+                paint_words(sentences[i]);
+            }
+            break;
+        case 2:
+            for (int i = 0; i < text.count_sentence; i++){
+                if (sentences[i].len == 1){
+                    continue;
+                }
+                print_word_with_cap(sentences[i]);
+            }
+            break;
+        case 3:
+            sort_by_last(sentences, text.count_sentence);
+            break;
+        case 4:
+            for (int i = 0; i < text.count_sentence; i++){
+                if (sentences[i].len == 1){
+                    continue;
+                }
+                delete_numbers(sentences[i]);
+            }
+            break;
+        default:
+            printf("Error: incorrect choise (choose 5 for view all options)");
+    }
 }
