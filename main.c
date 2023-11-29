@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 typedef struct {
     char* t;
@@ -12,14 +13,19 @@ typedef struct {
     char* text_sentence;
     int count_words;
     int len;
+    int self_number_in_text;
 } Sentence;
 
 char* get_text(int* count_sentence, int* size);
 char* get_sentence(char* text, int i, int* count_words);
 char* valid_sent(char* str, int* count_words);
 char** sep_to_words(char* sentence, int count_words);
-char* get_marks(char* sentence, int count_words);
-void paint_words(char* word, char mark);
+char** get_marks(char* sentence, int count_words);
+
+Sentence* get_structure_sentences(int count_sentence, char* text);
+void print_word_with_cap(Sentence sen);
+void delete_numbers(Sentence sen);
+void paint_words(Sentence sen);
 
 int main(){
     printf("Course work for option 5.7, created by Ryabov Mikhail.\n");
@@ -34,47 +40,49 @@ int main(){
 
     Text text;
     text.t = get_text(&text.count_sentence, &text.size);   
-    Sentence* sentences = (Sentence*)malloc(sizeof(Sentence) * text.count_sentence);
-    char*** arr_all_words = (char***)malloc(sizeof(char**) * text.count_sentence);
-    char** arr_all_marks = (char**)malloc(sizeof(char*) * text.count_sentence);
-    char* null_ptr = (char*)malloc(sizeof(char));
-    null_ptr[0] = '\0';
+    Sentence* sentences = get_structure_sentences(text.count_sentence, text.t);
+
 
     switch (choise){
-        case 1:
-            //раскраска слов
-            for (int i = 0; i < text.count_sentence; i++){
-                sentences[i].text_sentence = get_sentence(text.t, i, &sentences[i].count_words);
-                sentences[i].len = strlen(sentences[i].text_sentence) + 1;
-            }
-
-            for( int i = 0; i < text.count_sentence; i++){
-                for (int j = i+1; j < text.count_sentence; j++){
-                    if(strcmp(sentences[i].text_sentence, sentences[j].text_sentence) == 0){
-                        sentences[j].text_sentence = null_ptr;
-                        sentences[j].len = 1;
-                    }
-                }
-            }
-
+        case 0:
             for (int i = 0; i < text.count_sentence; i++){
                 if (sentences[i].len == 1){
                     continue;
                 }
-                arr_all_marks[i] = get_marks(sentences[i].text_sentence, sentences[i].count_words);
-                arr_all_words[i] = sep_to_words(sentences[i].text_sentence, sentences[i].count_words);
-
-                for (int j = 0; j < sentences[i].count_words; j++){
-                    paint_words(arr_all_words[i][j], arr_all_marks[i][j]);
+                printf("%s\n", sentences[i].text_sentence);
+            }
+            break;
+        case 1:
+            for (int i = 0; i < text.count_sentence; i++){
+                if (sentences[i].len == 1){
+                    continue;
                 }
-                printf("\n");
+                paint_words(sentences[i]);
             }
             break;
         case 2:
+            for (int i = 0; i < text.count_sentence; i++){
+                if (sentences[i].len == 1){
+                    continue;
+                }
+                print_word_with_cap(sentences[i]);
+            }
             break;
         case 3:
+            for (int i = 0; i < text.count_sentence; i++){
+                if (sentences[i].len == 1){
+                    continue;
+                }
+                print_word_with_cap(sentences[i]);
+            }
             break;
         case 4:
+            for (int i = 0; i < text.count_sentence; i++){
+                if (sentences[i].len == 1){
+                    continue;
+                }
+                delete_numbers(sentences[i]);
+            }
             break;
         default:
             printf("Error: incorrect choise (choose 5 for view all options)");
@@ -174,17 +182,22 @@ char** sep_to_words(char* sentence, int count_words) {
     return arr_words;
 }
 
-char* get_marks(char* sentence, int count_words){
-    char* marks = (char*)malloc(sizeof(char) * (count_words * 2));
+char** get_marks(char* sentence, int count_words){
+    char** marks = (char**)malloc(sizeof(char*) * (count_words));
     int i = 0, size = 0;
 
     while (sentence[i] != '\0'){
         if (sentence[i] == ' ' || sentence[i] == '.'){
-            marks[size++] = sentence[i];
+            marks[size] = (char*)malloc(sizeof(char)*2);
+            marks[size][0] = sentence[i];
+            marks[size++][1] = '\0';
         }
 
         if (sentence[i] == ','){
-            marks[size++] = sentence[i];
+            marks[size] = (char*)malloc(sizeof(char)*3);
+            marks[size][0] = sentence[i];
+            marks[size][1] = ' ';
+            marks[size++][2] = '\0';
             i++;
         }
 
@@ -195,34 +208,68 @@ char* get_marks(char* sentence, int count_words){
     return marks;
 }
 
-void paint_words(char* word, char mark){
-    int result = strlen(word) % 4;
-    if (mark != ' '){
+void paint_words(Sentence sen){
+    char** marks = get_marks(sen.text_sentence, sen.count_words);
+    char** words = sep_to_words(sen.text_sentence, sen.count_words);
+
+    for (int i = 0; i < sen.count_words; i++){
+        int result = strlen(words[i]) % 4;
         if (result == 0) {
-            printf("\x1b[31m%s\x1b[0m%c ", word, mark);
+            printf("\x1b[31m%s\x1b[0m%s", words[i], marks[i]);
         }
         if (result == 1) {
-            printf("\x1b[34m%s\x1b[0m%c ", word, mark);
+            printf("\x1b[34m%s\x1b[0m%s", words[i], marks[i]);
         }
         if (result == 2) {
-            printf("\x1b[32m%s\x1b[0m%c ", word, mark);
+            printf("\x1b[32m%s\x1b[0m%s", words[i], marks[i]);
         }
         if (result == 3) {
-            printf("\x1b[33m%s\x1b[0m%c", word, mark);
-        }       
-    }
-    else{
-        if (result == 0) {
-            printf("\x1b[31m%s\x1b[0m ", word);
-        }
-        if (result == 1) {
-            printf("\x1b[34m%s\x1b[0m ", word);
-        }
-        if (result == 2) {
-            printf("\x1b[32m%s\x1b[0m ", word);
-        }
-        if (result == 3) {
-            printf("\x1b[33m%s\x1b[0m ", word);
+            printf("\x1b[33m%s\x1b[0m%s", words[i], marks[i]);
         }
     }
+    printf("\n");
+}
+
+Sentence* get_structure_sentences(int count_sentence, char* text){
+    Sentence* sentences = (Sentence*)malloc(sizeof(Sentence) * count_sentence);
+    char* null_ptr = (char*)malloc(sizeof(char));
+    null_ptr[0] = '\0';
+
+    for (int i = 0; i < count_sentence; i++){
+        sentences[i].self_number_in_text = i+1;
+        sentences[i].text_sentence = get_sentence(text, i, &sentences[i].count_words);
+        sentences[i].len = strlen(sentences[i].text_sentence) + 1;
+    }
+
+    for( int i = 0; i < count_sentence; i++){
+        for (int j = i+1; j < count_sentence; j++){
+            if(strcasecmp(sentences[i].text_sentence, sentences[j].text_sentence) == 0){
+                sentences[j].text_sentence = null_ptr;
+                sentences[j].len = 1;
+            }
+        }
+    }
+    return sentences;
+}
+
+void print_word_with_cap(Sentence sen){
+    char** words = sep_to_words(sen.text_sentence, sen.count_words);
+    for (int i = 0; i < sen.count_words; i++){
+        int end = strlen(words[i]);
+        if (isupper(words[i][0]) && isupper(words[i][end-1])){
+            printf("%s number sentense - %d\n", words[i], sen.self_number_in_text);
+        }
+    }
+}
+
+void delete_numbers(Sentence sen){
+    char** marks = get_marks(sen.text_sentence, sen.count_words);
+    char** words = sep_to_words(sen.text_sentence, sen.count_words);
+    
+    for (int i = 0; i < sen.count_words; i++){
+        if (strtol(words[i], NULL, 10) == 0){
+            printf("%s%s", words[i], marks[i]);
+        }
+    }
+    printf("\n");
 }
