@@ -7,6 +7,15 @@
 #include "input_output.h"
 
 
+void replace_words(Sentence sen, wchar_t* word_x, wchar_t* word_y){
+    for(int i = 0; i < sen.count_words; i++){
+        if(wcscasecmp(sen.text_sentence[i], word_x) == 0){
+            sen.text_sentence[i] = word_y;
+        }
+    }
+    output_sentense(sen.text_sentence, sen.count_words);
+}
+
 void paint_words(Sentence sent){
     for(int i = 0; i < sent.count_words; i++){
         int size_word = wcslen(sent.text_sentence[i]), skip_sym = 0;

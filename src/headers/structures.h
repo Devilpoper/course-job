@@ -18,3 +18,4 @@ typedef struct {
 Sentence* get_structure_sentences(int *count_sentence, wchar_t* text);
 wchar_t** get_sentence(wchar_t* text, int i, int *count_words);
 wchar_t* get_structure_text(int* count_sentence, int* size);
+wchar_t* get_first_str();

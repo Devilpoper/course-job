@@ -5,6 +5,23 @@
 #include "validation.h"
 #include "functions.h"
 
+wchar_t* get_first_str(){
+    int capacity = 1, size = 0;
+    wchar_t* text = (wchar_t*)malloc(sizeof(wchar_t) * capacity);
+    wchar_t letter = getwchar();
+
+    while(letter != L'\n'){
+        text[size++] = letter;
+        if(size >= letter){
+            capacity *= 2;
+            text = (wchar_t*)realloc(text, sizeof(wchar_t) * capacity);
+        } 
+        letter = getwchar();
+    }
+    text[size] = '\0';
+    return text;
+}
+
 Sentence* get_structure_sentences(int *count_sentence, wchar_t* text){
     Sentence* sentences = (Sentence*)malloc(sizeof(Sentence) * (*count_sentence));
     //поделить на предложения и валидировать

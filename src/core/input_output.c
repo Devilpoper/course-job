@@ -17,7 +17,12 @@ void input_choise(wchar_t choise){
         4 - Remove all numbers from sentences. A number is a set of consecutive numbers preceded and followed by spaces.\n");
         exit(0);
     }
-    if (wcstol(&choise, NULL, 10) >= 5 || wcstol(&choise, NULL, 10) < 0 || iswdigit(choise) == 0){
+    wchar_t* words_xy;
+    wchar_t* ptr;
+    if (choise == '9'){
+        words_xy = get_first_str();
+    }
+    if ((wcstol(&choise, NULL, 10) >= 5 || wcstol(&choise, NULL, 10) < 0 || iswdigit(choise) == 0) && choise != '9'){
         wprintf(L"Error: input incorrect number\n");
         exit(0);
     }
@@ -54,6 +59,14 @@ void input_choise(wchar_t choise){
     case '4':
         for ( int i =0; i < text.count_sentence; i++){
             delete_numbers(sentences[i]);
+        }
+        break;
+
+    case '9':
+        wchar_t* word_x = wcstok(words_xy, L" ", &ptr);
+        wchar_t* word_y = wcstok(NULL, L" ", &ptr);
+        for ( int i =0; i < text.count_sentence; i++){
+            replace_words(sentences[i], word_x, word_y);
         }
         break;
     }
