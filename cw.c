@@ -20,17 +20,21 @@ typedef struct {
 } Sentence;
 
 Sentence* get_structure_sentences(int *count_sentence, wchar_t* text);
+wchar_t** get_sentence(wchar_t* text, int i, int *count_words);
+wchar_t* get_structure_text(int* count_sentence, int* size);
+
 wchar_t** validate_sentence(wchar_t* sentence, int* count);
 wchar_t* wcdup_with_symb(wchar_t* word, wchar_t symb);
-wchar_t** get_sentence(wchar_t* text, int i, int *count_words);
-void sort_by_last(Sentence* sentences, int count_sentence);
-int compare(const void* a, const void* b);
-wchar_t* get_structure_text(int* count_sentence, int* size);
-void print_word_with_cap(Sentence sen);
+
 void input_choise(wchar_t choise);
 void output_sentense(wchar_t** arr_words, int size);
+
 void paint_words(Sentence sent);
 void delete_numbers(Sentence sent);
+void print_word_with_cap(Sentence sen);
+void sort_by_last(Sentence* sentences, int count_sentence);
+int compare(const void* a, const void* b);
+
 
 int main(){
     setlocale(LC_ALL, "ru_RU.utf8");
@@ -257,7 +261,7 @@ wchar_t** validate_sentence(wchar_t* sentence, int *count_words){
     wchar_t* sep_word = wcstok(sentence, L" ", &ptr);
 
     while (sep_word != NULL){
-        if (wcslen(sep_word) == 1 && (iswalpha(sep_word[0]) == 0 && iswdigit(sep_word[0]) == 0)){
+        if (wcslen(sep_word) == 1 && sep_word[0] == L',' ){
             wchar_t* new_sep_word = wcdup_with_symb(arr_words[size-1], sep_word[0]);
             arr_words[size-1] = new_sep_word;
         }
